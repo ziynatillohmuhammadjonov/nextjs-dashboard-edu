@@ -15,3 +15,5 @@ export type FormState = {
     [key: string]: string[] | undefined;
   };
 };
+
+export const initialFormState: FormState = { success: false, message: "" };

@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { loginUser } from "@/actions/login-user";
+import { initialFormState } from "@/types/user-type";
+import { useActionState, useState } from "react";
 
 const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-indigo-400";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [state, formAction] = useActionState(loginUser, initialFormState);
 
   return (
-    <form className="space-y-4" noValidate={false}>
+    <form action={formAction} className="space-y-4" noValidate={false}>
       {/* Username */}
       <div className="space-y-1.5">
         <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
