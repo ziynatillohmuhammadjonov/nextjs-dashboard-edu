@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type PostCardProps = {
@@ -17,7 +18,7 @@ export function PostCard({ post }: PostCardProps) {
     <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
       {/* Cover */}
       <Link href={`/posts/${post.id}`}>
-        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-600">
+        {/* <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-600">
           <div className="absolute inset-0 bg-black/10 transition group-hover:bg-black/0" />
 
           <div className="absolute left-4 top-4">
@@ -27,7 +28,8 @@ export function PostCard({ post }: PostCardProps) {
           <div className="absolute bottom-4 right-4">
             <span className="rounded-full bg-black/30 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">{post.readTime}</span>
           </div>
-        </div>
+        </div> */}
+        <Image src={"https://picsum.photos/200/300"} width={200} height={300} alt="Ipsum photo" />
       </Link>
 
       {/* Content */}

@@ -1,5 +1,7 @@
+import { auth, signOut } from "@/auth";
 import ThemeToggle from "@/components/theme-toggle";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const navigation = [
   {
@@ -24,7 +26,11 @@ const navigation = [
   },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
   return (
     <div className="min-h-[calc(100vh-128px)] bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-white">
       <div className="flex min-h-screen">
@@ -108,6 +114,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               <ThemeToggle />
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">A</div>
+              <form
+                action={async () => {
+                  "use server";
+                  await signOut({ redirectTo: "/login" });
+                }}
+              >
+                <button>Chiqish</button>
+              </form>
             </div>
           </header>
 

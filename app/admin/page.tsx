@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import Link from "next/link";
 
 const stats = [
@@ -89,7 +90,9 @@ const activities = [
   },
 ];
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  const session = await auth();
+  console.log(session);
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       {/* Page Header */}
