@@ -1,13 +1,8 @@
-import { auth, signIn } from "@/auth";
+import { signIn } from "@/auth";
 import LoginForm from "@/components/LoginForm";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
-  const session = await auth();
-  if (session?.user) {
-    redirect("/admin");
-  }
-
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4 text-slate-900 dark:bg-slate-950 dark:text-white">
       <div className="w-full max-w-md">
@@ -33,7 +28,9 @@ export default async function LoginPage() {
             <form
               action={async () => {
                 "use server";
-                await signIn("github", { redirectTo: "/admin" });
+                await signIn("github", {
+                  redirectTo: "/admin",
+                });
               }}
             >
               <button type="submit" className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 active:scale-[0.99] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
@@ -46,12 +43,7 @@ export default async function LoginPage() {
             </form>
 
             {/* Google */}
-            <form
-              action={async () => {
-                "use server";
-                await signIn("google", { redirectTo: "/admin" });
-              }}
-            >
+            <form>
               <button type="submit" className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 active:scale-[0.99] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
                 {/* Google Icon */}
                 <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">

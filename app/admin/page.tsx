@@ -92,7 +92,7 @@ const activities = [
 
 export default async function AdminDashboard() {
   const session = await auth();
-  console.log(session);
+  console.log("session ✅ ", session);
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       {/* Page Header */}

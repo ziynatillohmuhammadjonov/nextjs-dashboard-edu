@@ -1,4 +1,4 @@
-import { auth, signOut } from "@/auth";
+import { auth, signOut } from "@/-example";
 import ThemeToggle from "@/components/theme-toggle";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -27,10 +27,10 @@ const navigation = [
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/login");
-  }
+  // const session = await auth();
+  // if (!session?.user) {
+  //   redirect("/login");
+  // }
   return (
     <div className="min-h-[calc(100vh-128px)] bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-white">
       <div className="flex min-h-screen">
