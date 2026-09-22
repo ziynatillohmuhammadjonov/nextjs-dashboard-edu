@@ -1,11 +1,13 @@
 export type UserType = {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  user_name: string;
+  userName: string;
   role: string;
-  bio: string;
-  created_at: string;
+  bio: string | null;
+  avatarUrl: string | null;
+  avatarKey: string | null;
+  createdAt: Date;
 };
 
 export type FormState = {

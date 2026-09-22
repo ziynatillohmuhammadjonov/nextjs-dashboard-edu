@@ -1,16 +1,22 @@
 "use server";
 
-import { db } from "@/lib/db";
-import { createUserSchema } from "@/schemas/create-user-schema";
+import { prisma } from "@/lib/prisma";
+import { localAdapter } from "@/lib/storage/locale";
+import { StoredFile, UploadInput } from "@/lib/storage/types";
+import { createUserSchema } from "@/lib/validations/create-user-schema";
 import { FormState } from "@/types/user-type";
 import z from "zod";
 
-export default async function createUser(_prev: FormState, formData: FormData): Promise<FormState> {
+export default async function createUser(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const name = formData.get("name");
   const email = formData.get("email");
   const userName = formData.get("userName");
   const role = formData.get("role");
   const bio = formData.get("bio");
+  const avatarDate = formData.get("avatar");
 
   const result = createUserSchema.safeParse({
     name,
@@ -18,6 +24,7 @@ export default async function createUser(_prev: FormState, formData: FormData): 
     userName,
     role,
     bio,
+    avatar: avatarDate,
   });
 
   if (!result.success) {
@@ -29,20 +36,55 @@ export default async function createUser(_prev: FormState, formData: FormData): 
     };
   }
 
-  if (typeof name !== "string" || typeof email !== "string" || typeof userName !== "string" || typeof role !== "string" || typeof bio !== "string") {
+  if (
+    typeof name !== "string" ||
+    typeof email !== "string" ||
+    typeof userName !== "string" ||
+    typeof role !== "string" ||
+    typeof bio !== "string"
+  ) {
     return {
       success: false,
       message: "Unknown type",
     };
   }
+
+  const { avatar, ...data } = result.data;
+
+  let newAvatar: StoredFile | null = null;
+
+  if (avatar.size > 0) {
+    try {
+      const image: UploadInput = {
+        buffer: Buffer.from(await avatar.arrayBuffer()),
+        mimetype: avatar.type,
+        extension: avatar.name.split(".").pop() ?? "jpg",
+      };
+      newAvatar = await localAdapter.uploadFile(image);
+    } catch (error) {
+      console.log(error);
+      return {
+        success: false,
+        errors: {
+          avatar: ["Rasmni saqlab bo'lmadi. Boshqa rasm tanlab ko'ring."],
+        },
+        message: "Validation errors",
+      };
+    }
+  }
+
   try {
-    await db.query(
-      `
-        INSERT INTO users (name, email, user_name, role, bio)
-        VALUES ($1, $2, $3, $4, $5)
-    `,
-      [name.trim(), email.trim(), userName.trim(), role.trim(), bio.trim()],
-    );
+    await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: email.trim(),
+        userName: userName.trim(),
+        role: role.trim(),
+        bio: bio.trim() || null,
+        avatarUrl: newAvatar?.url ?? null,
+        avatarKey: newAvatar?.url ?? null,
+      },
+    });
 
     return {
       success: true,

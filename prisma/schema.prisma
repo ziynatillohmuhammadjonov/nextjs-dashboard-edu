@@ -16,17 +16,13 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
+  userName  String   @unique
+  role      String
+  bio       String?
+  avatarUrl String?
+  avatarKey String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  @@map("users")
-}
 
-model Blogs {
-  id Int @id @default(autoincrement())
-  title String
-  body String
-  
-createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("blogs")
+  @@map("users")
 }
