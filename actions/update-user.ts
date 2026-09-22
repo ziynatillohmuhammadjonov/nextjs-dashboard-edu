@@ -1,91 +1,80 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { localAdapter } from "@/lib/storage/locale";
+import { storage } from "@/lib/storage";
 import { processImage } from "@/lib/storage/process-image";
-import { StoredFile, UploadInput } from "@/lib/storage/types";
+import type { StoredFile } from "@/lib/storage/types";
 import { createUserSchema } from "@/lib/validations/create-user-schema";
 
-export default async function updateUser(userId: string, formData: FormData) {
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const userName = formData.get("userName");
-  const role = formData.get("role");
-  const bio = formData.get("bio");
-  const avatarData = formData.get("avatar");
+export type UpdateUserState = {
+  success: boolean;
+  message?: string;
+  errors?: Record<string, string[] | undefined>;
+};
 
+export default async function updateUser(userId: string, prevState: UpdateUserState, formData: FormData): Promise<UpdateUserState> {
   const result = createUserSchema.safeParse({
-    name,
-    email,
-    userName,
-    role,
-    bio,
-    avatar: avatarData,
+    name: formData.get("name"),
+    email: formData.get("email"),
+    userName: formData.get("userName"),
+    role: formData.get("role"),
+    bio: formData.get("bio"),
+    avatar: formData.get("avatar"),
   });
 
   if (!result.success) {
-    throw new Error("Validation error");
+    return {
+      success: false,
+      message: "Maydonlarni tekshiring",
+      errors: z.flattenError(result.error).fieldErrors,
+    };
   }
 
-  if (
-    typeof name !== "string" ||
-    typeof email !== "string" ||
-    typeof userName !== "string" ||
-    typeof role !== "string" ||
-    typeof bio !== "string"
-  ) {
-    throw new Error("All columns are required");
-  }
   const { avatar, ...data } = result.data;
+
+  const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
+  if (!user) return { success: false, message: "Foydalanuvchi topilmadi" };
 
   let newAvatar: StoredFile | null = null;
 
-  const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
-
   if (avatar.size > 0) {
     try {
-      // const image: UploadInput = {
-      //   buffer: Buffer.from(await avatar.arrayBuffer()),
-      //   mimetype: avatar.type,
-      //   extension: avatar.name.split(".").pop() ?? "jpg",
-      // };
-      if (user?.avatarKey) await localAdapter.deleteFile(user.avatarKey);
       const image = await processImage(avatar);
-      newAvatar = await localAdapter.uploadFile(image);
+      newAvatar = await storage.uploadFile(image);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return {
         success: false,
-        errors: {
-          avatar: ["Rasmni saqlab bo'lmadi. Boshqa rasm tanlab ko'ring."],
-        },
-        message: "Validation errors",
+        errors: { avatar: ["Rasmni saqlab bo'lmadi. Boshqa rasm tanlab ko'ring."] },
       };
     }
   }
+
   try {
     await prisma.user.update({
-      where: { id: Number(userId) },
+      where: { id: user.id },
       data: {
-        name: name.trim(),
-        email: email.trim(),
-        userName: userName.trim(),
-        role: role.trim(),
-        bio: bio.trim() || null,
-        avatarUrl: newAvatar?.url ?? null,
-        avatarKey: newAvatar?.url ?? null,
+        ...data,
+        bio: data.bio || null,
+        ...(newAvatar && { avatarUrl: newAvatar.url, avatarKey: newAvatar.key }),
       },
     });
-
-    return {
-      success: true,
-      message: "User created",
-    };
   } catch (error) {
-    console.log(error);
-    return {
-      success: false,
-      message: "Saqlashda xatolik",
-    };
+    console.error(error);
+    if (newAvatar) await storage.deleteFile(newAvatar.key).catch(() => {});
+    return { success: false, message: "Saqlashda xatolik" };
   }
+
+  if (newAvatar && user.avatarKey) {
+    try {
+      await storage.deleteFile(user.avatarKey);
+    } catch (error) {
+      console.error("Eski rasmni o'chirib bo'lmadi:", user.avatarKey, error);
+    }
+  }
+
+  revalidatePath("/admin/users");
+  return { success: true, message: "Foydalanuvchi yangilandi" };
 }

@@ -1,16 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { localAdapter } from "@/lib/storage/locale";
+import { storage } from "@/lib/storage";
 import { StoredFile, UploadInput } from "@/lib/storage/types";
 import { createUserSchema } from "@/lib/validations/create-user-schema";
 import { FormState } from "@/types/user-type";
 import z from "zod";
 
-export default async function createUser(
-  _prev: FormState,
-  formData: FormData,
-): Promise<FormState> {
+export default async function createUser(_prev: FormState, formData: FormData): Promise<FormState> {
   const name = formData.get("name");
   const email = formData.get("email");
   const userName = formData.get("userName");
@@ -36,13 +33,7 @@ export default async function createUser(
     };
   }
 
-  if (
-    typeof name !== "string" ||
-    typeof email !== "string" ||
-    typeof userName !== "string" ||
-    typeof role !== "string" ||
-    typeof bio !== "string"
-  ) {
+  if (typeof name !== "string" || typeof email !== "string" || typeof userName !== "string" || typeof role !== "string" || typeof bio !== "string") {
     return {
       success: false,
       message: "Unknown type",
@@ -60,7 +51,7 @@ export default async function createUser(
         mimetype: avatar.type,
         extension: avatar.name.split(".").pop() ?? "jpg",
       };
-      newAvatar = await localAdapter.uploadFile(image);
+      newAvatar = await storage.uploadFile(image);
     } catch (error) {
       console.log(error);
       return {

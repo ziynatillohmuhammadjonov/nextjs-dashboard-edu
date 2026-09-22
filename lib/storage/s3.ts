@@ -1,9 +1,6 @@
-import {
-  DeleteObjectCommand,
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { StorageAdapter } from "./types";
+import crypto from "node:crypto";
 
 function requireEnv(name: string): string {
   const value = process.env[name];
@@ -24,9 +21,9 @@ const s3 = new S3Client({
 const BUCKET = requireEnv("AWS_S3_BUCKET");
 const PUBLIC_URL = requireEnv("S3_PUBLIC_URL");
 
-export const s3Adapted: StorageAdapter = {
+export const s3Adapter: StorageAdapter = {
   async uploadFile(file) {
-    const key = `avaters/${crypto}.${file.extension}`;
+    const key = `avatars/${crypto.randomUUID()}.${file.extension}`;
     await s3.send(
       new PutObjectCommand({
         Bucket: BUCKET,
