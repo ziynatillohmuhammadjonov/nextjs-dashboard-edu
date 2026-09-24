@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/-example";
+import { signIn } from "@/auth";
 import { loginUserSchema } from "@/schemas/login-user-schema";
 import { FormState } from "@/types/user-type";
 import { AuthError } from "next-auth";

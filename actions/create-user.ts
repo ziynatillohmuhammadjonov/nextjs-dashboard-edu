@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { storage } from "@/lib/storage";
+import { processImage } from "@/lib/storage/process-image";
 import { StoredFile, UploadInput } from "@/lib/storage/types";
 import { createUserSchema } from "@/lib/validations/create-user-schema";
 import { FormState } from "@/types/user-type";
@@ -46,11 +47,12 @@ export default async function createUser(_prev: FormState, formData: FormData): 
 
   if (avatar.size > 0) {
     try {
-      const image: UploadInput = {
-        buffer: Buffer.from(await avatar.arrayBuffer()),
-        mimetype: avatar.type,
-        extension: avatar.name.split(".").pop() ?? "jpg",
-      };
+      // const image: UploadInput = {
+      //   buffer: Buffer.from(await avatar.arrayBuffer()),
+      //   mimetype: avatar.type,
+      //   extension: avatar.name.split(".").pop() ?? "jpg",
+      // };
+      const image = await processImage(avatar);
       newAvatar = await storage.uploadFile(image);
     } catch (error) {
       console.log(error);

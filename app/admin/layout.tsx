@@ -1,4 +1,4 @@
-import { auth, signOut } from "@/-example";
+import { auth, signOut } from "@/auth";
 import ThemeToggle from "@/components/theme-toggle";
 import Link from "next/link";
 import { redirect } from "next/navigation";
