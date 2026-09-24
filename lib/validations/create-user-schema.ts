@@ -1,5 +1,4 @@
-import { ALL } from "dns";
-import z, { file } from "zod";
+import z from "zod";
 
 export const RoleSchema = z.enum(["admin", "user", "teacher"]);
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
