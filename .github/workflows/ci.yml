@@ -28,6 +28,11 @@ jobs: # workflow ichidagi asosiy ishlar
           with:
             node-version: 22 # with orqali bir actionga cofiguratsiya bersak bo'ladi
 
+        - name: Setup pnpm
+          uses: pnpm/action-setup@v4
+          with:
+            version: 10
+
         - name: Install dependensies
           run: pnpm install
 
@@ -52,6 +57,11 @@ jobs: # workflow ichidagi asosiy ishlar
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Build application
         run: |
