@@ -31,7 +31,7 @@ jobs: # workflow ichidagi asosiy ishlar
         - name: Setup pnpm
           uses: pnpm/action-setup@v4
           with:
-            version: 10
+            version: 11.8.0
 
         - name: Install dependensies
           run: pnpm install
@@ -61,7 +61,7 @@ jobs: # workflow ichidagi asosiy ishlar
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 11.8.0
 
       - name: Build application
         run: |
