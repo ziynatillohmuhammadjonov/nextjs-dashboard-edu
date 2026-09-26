@@ -1,0 +1,15 @@
+# Yaml sintaksisi
+# ymlda ; lar {} la ishlatilmaydi uni o'rniga bo'sh joylar ikkitalik probel ishlatiladi.
+name: readme yml # bu nomlanish string tiplar ham "" siz ishlatiladi
+enabled: true # booleanlar shunday 
+age: 25 # numberlar shunday ishlatiladi
+languages: 
+  - JavaScript
+  - TypeScript
+  - PHP # massivlar shunday shaklida ishlatilishi yaxshi oddiy js massivi ko'rinishida ham ishlatsa bo'laidi.
+
+user: # ichma ich obyekt ko'rinishida ham ishlatilishi mumkin.
+  name: Ali
+  address:
+    city: Farg'ona
+    country: O'zbekiston
