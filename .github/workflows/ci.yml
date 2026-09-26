@@ -67,14 +67,15 @@ jobs: # workflow ichidagi asosiy ishlar
         run: |
           pnpm install
           pnpm test
+          pnpm prisma generate
           pnpm build
-        working-directory: frontend # faqat frontend papkasi ichida ishlashi kerak bo'lsa
+        # working-directory: frontend # faqat frontend papkasi ichida ishlashi kerak bo'lsa
 
       - name: Deploy
-        if: github.ref == 'refs/heads/main' # steps yoki jobni shart asosida ishaltish
+        if: github.ref == 'refs/heads/master' # steps yoki jobni shart asosida ishaltish
         run: pnpm deploy
 
-  compleate-test:
+  complete-test:
     needs: 
       - test
       - build
