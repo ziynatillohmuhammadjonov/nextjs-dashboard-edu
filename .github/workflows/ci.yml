@@ -71,7 +71,7 @@ jobs: # workflow ichidagi asosiy ishlar
         # working-directory: frontend # faqat frontend papkasi ichida ishlashi kerak bo'lsa
 
       - name: Deploy
-        if: github.ref == 'refs/heads/main' # steps yoki jobni shart asosida ishaltish
+        if: github.ref == 'refs/heads/master' # steps yoki jobni shart asosida ishaltish
         run: pnpm deploy
 
   compleate-test:
