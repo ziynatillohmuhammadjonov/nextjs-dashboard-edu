@@ -10,7 +10,7 @@ on: # workflow qachon ichga tushishi misol quyidagi holatda mainga push qilganda
       - master # yana - branchNomi bilan boshqa branchlarni ham qo'shishimiz mumkin 
   pull_request: # mainga pull_request ochganda ishga tushadi
     branches:
-      - maste
+      - master
 
 jobs: # workflow ichidagi asosiy ishlar
   test: # jobId uni boshqa choyda shu orqali chaqirib ishlatamiz
