@@ -1,0 +1,100 @@
+name: CI # workflow nomi
+
+env: # workflow darajasida global env. Lekin maxfiy envlarni settings->secret and variables ->actions ->new repository secret orqali qo'shamiz. 
+  NODE_ENV: production
+  DATABASE_URL: ${{secrets.DATABASE_URL}} # settings ichidagi secretlarni olib shunday tarizda ishlatamiz
+
+on: # workflow qachon ichga tushishi misol quyidagi holatda mainga push qilganda ishga tushadi. Bir necha eventlari ham ko'rsatishimiz mumkin.
+  push:
+    branches:
+      - master # yana - branchNomi bilan boshqa branchlarni ham qo'shishimiz mumkin 
+  pull_request: # mainga pull_request ochganda ishga tushadi
+    branches:
+      - master
+
+jobs: # workflow ichidagi asosiy ishlar
+  test: # jobId uni boshqa choyda shu orqali chaqirib ishlatamiz
+    runs-on: ubuntu-latest # job qaysi operatsion sistemada ishlatamiz
+      
+    steps: # job ichida konkret amallar 
+        - name: global envni ishlatish
+          run: echo $NODE_ENV
+
+        - name: Checkout repository 
+          uses: actions/checkout@v4 # uses bu tayyor github actions bo'lib bizga malum ishlarni qilib beradi. Misol bu loyihani runnerga olib keladi.
+
+        - name: Setup Node
+          uses: actions/setup-node@v4
+          with:
+            node-version: 22 # with orqali bir actionga cofiguratsiya bersak bo'ladi
+
+        - name: Setup pnpm
+          uses: pnpm/action-setup@v4
+          with:
+            version: 11.8.0
+
+        - name: Install dependensies
+          run: pnpm install
+
+        - name: Run test
+          run: pnpm test # har bir yangi step - bilan boshlanadi
+
+        - name: Step level env
+          env:
+            NODE_STEP_ENV: test # step darajasida env
+          run: echo $NODE_STEP_ENV
+
+  build:
+    needs: test # bir job ikkinchisidan keyin ishlashi kerak bo'lsa. Agar bir nechta bo'lsa - jobId  ko'rinishida berib ketamiz.
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10 # job maksimal qancha vaqt ishlashi kerak bo'lsa
+
+    env: # job darajasida env
+      NODE_JOB_ENV: job-env
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.8.0
+
+      - name: Build application
+        run: |
+          pnpm install
+          pnpm test
+          pnpm build
+        working-directory: frontend # faqat frontend papkasi ichida ishlashi kerak bo'lsa
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main' # steps yoki jobni shart asosida ishaltish
+        run: pnpm deploy
+
+  compleate-test:
+    needs: 
+      - test
+      - build
+
+    runs-on: ubuntu-latest
+
+    strategy: # agar bir jobni bir nechta environment da ishga tushurish kerak bo'lsa
+      matrix:
+        node-version:
+          - 20
+          - 22
+          - 24
+
+    steps:
+      - uses: actions/repository@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: pnpm install
+
+      - run: pnpm test
