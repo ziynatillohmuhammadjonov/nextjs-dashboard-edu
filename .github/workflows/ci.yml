@@ -7,10 +7,10 @@ env: # workflow darajasida global env. Lekin maxfiy envlarni settings->secret an
 on: # workflow qachon ichga tushishi misol quyidagi holatda mainga push qilganda ishga tushadi. Bir necha eventlari ham ko'rsatishimiz mumkin.
   push:
     branches:
-      - main # yana - branchNomi bilan boshqa branchlarni ham qo'shishimiz mumkin 
+      - master # yana - branchNomi bilan boshqa branchlarni ham qo'shishimiz mumkin 
   pull_request: # mainga pull_request ochganda ishga tushadi
     branches:
-      - main
+      - maste
 
 jobs: # workflow ichidagi asosiy ishlar
   test: # jobId uni boshqa choyda shu orqali chaqirib ishlatamiz
